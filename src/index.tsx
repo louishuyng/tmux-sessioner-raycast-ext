@@ -17,7 +17,7 @@ async function switchToSession(session: string) {
       console.error(`exec error: ${error}`);
 
       toast.style = Toast.Style.Failure;
-      toast.title = "Something went wrong 😢";
+      toast.title = "No tmux client found 😢";
       toast.message = error.message;
 
       return;
