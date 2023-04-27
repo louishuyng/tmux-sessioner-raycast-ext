@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { List, Icon, Action, ActionPanel, Toast, showToast } from "@raycast/api";
 import { exec, execSync } from "child_process";
 
-const BIN_PATH = "/opt/homebrew/bin/tmux"; // TODO: Make this configurable
+const env = Object.assign({}, process.env, { PATH: "/usr/local/bin:/usr/bin:/opt/homebrew/bin" });
 
 function openTerminal() {
   const TERM = "Kitty"; // TODO:; Make this configurable
@@ -12,7 +12,7 @@ function openTerminal() {
 async function switchToSession(session: string) {
   const toast = await showToast({ style: Toast.Style.Animated, title: "Permission Checking" });
 
-  exec(`${BIN_PATH} switch -t ${session}`, async (error, stdout, stderr) => {
+  exec(`tmux switch -t ${session}`, { env }, async (error, stdout, stderr) => {
     if (error) {
       console.error(`exec error: ${error}`);
 
@@ -44,7 +44,7 @@ export default function Command() {
     setIsLoading(true);
 
     // List down all tmux session
-    exec(`${BIN_PATH} list-sessions | awk '{print $1}' | sed 's/://'`, (error, stdout, stderr) => {
+    exec(`tmux list-sessions | awk '{print $1}' | sed 's/://'`, { env }, (error, stdout, stderr) => {
       if (error) {
         console.error(`exec error: ${error}`);
         setIsLoading(false);
