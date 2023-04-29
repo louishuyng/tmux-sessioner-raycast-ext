@@ -1,43 +1,8 @@
 import { useState, useEffect } from "react";
 import { List, Icon, Action, ActionPanel, Toast, showToast, Detail } from "@raycast/api";
-import { exec, execSync } from "child_process";
-import { LocalStorage, showHUD } from "@raycast/api";
+import { LocalStorage } from "@raycast/api";
 import { SelectTerminalApp } from "./SelectTermnialApp";
-import { getAllSession } from "./sessionUtils";
-import { env } from "./config";
-
-async function openTerminal() {
-  const localTerminalAppName = await LocalStorage.getItem<string>("terminalAppName");
-  execSync(`open -a ${localTerminalAppName}`);
-}
-
-async function switchToSession(session: string) {
-  const toast = await showToast({ style: Toast.Style.Animated, title: "Permission Checking" });
-
-  exec(`tmux switch -t ${session}`, { env }, async (error, stdout, stderr) => {
-    if (error) {
-      console.error(`exec error: ${error}`);
-
-      toast.style = Toast.Style.Failure;
-      toast.title = "No tmux client found 😢";
-      toast.message = error.message;
-
-      return;
-    }
-
-    try {
-      await openTerminal();
-
-      toast.style = Toast.Style.Success;
-      toast.title = `Switched to session ${session}`;
-      await showHUD(`Switched to session ${session}`);
-    } catch (e) {
-      toast.style = Toast.Style.Failure;
-      toast.title = "Terminal not supported 😢";
-    }
-    return;
-  });
-}
+import { deleteSession, getAllSession, switchToSession } from "./sessionUtils";
 
 export default function Command() {
   const [sessions, setSessions] = useState<Array<string>>([]);
@@ -112,7 +77,14 @@ export default function Command() {
             title={session}
             actions={
               <ActionPanel>
-                <Action title="Switch To Selected Session" onAction={() => switchToSession(session)} />
+                <Action title="Switch To Selected Session" onAction={() => switchToSession(session, setIsLoading)} />
+                <Action
+                  title="Delete This Session"
+                  onAction={() =>
+                    deleteSession(session, setIsLoading, () => setSessions(sessions.filter((s) => s !== session)))
+                  }
+                  shortcut={{ modifiers: ["cmd"], key: "d" }}
+                />
               </ActionPanel>
             }
           />
