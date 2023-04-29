@@ -15,6 +15,14 @@ export function creatNewSession(
   return exec(`tmux new-session -d -s ${sessionName}`, { env }, callback);
 }
 
+export function renameSession(
+  oldSessionName: string,
+  newSessionName: string,
+  callback: (error: ExecException | null, stdout: string, stderr: string) => void
+): ChildProcess {
+  return exec(`tmux rename-session -t ${oldSessionName} ${newSessionName}`, { env }, callback);
+}
+
 export async function switchToSession(session: string, setLoading: (value: boolean) => void) {
   const toast = await showToast({ style: Toast.Style.Animated, title: "" });
   setLoading(true);
@@ -47,6 +55,11 @@ export async function switchToSession(session: string, setLoading: (value: boole
   });
 }
 
+async function openTerminal() {
+  const localTerminalAppName = await LocalStorage.getItem<string>("terminalAppName");
+  execSync(`open -a ${localTerminalAppName}`);
+}
+
 export async function deleteSession(session: string, setLoading: (value: boolean) => void, callback: () => void) {
   setLoading(true);
   const toast = await showToast({ style: Toast.Style.Animated, title: "" });
@@ -67,9 +80,4 @@ export async function deleteSession(session: string, setLoading: (value: boolean
     callback();
     setLoading(false);
   });
-}
-
-async function openTerminal() {
-  const localTerminalAppName = await LocalStorage.getItem<string>("terminalAppName");
-  execSync(`open -a ${localTerminalAppName}`);
 }

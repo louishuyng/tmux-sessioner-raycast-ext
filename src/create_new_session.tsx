@@ -8,13 +8,12 @@ export default function CreateNewTmuxSession() {
 
   return (
     <Form
-      enableDrafts
       isLoading={loading}
       navigationTitle="Create New Tmux Session"
       actions={
         <ActionPanel>
           <Action.SubmitForm
-            title="Submit Terminal App Name"
+            title="Create New Session"
             onSubmit={async (values) => {
               const sessionName = values.newSessionName;
               setLoading(true);
@@ -35,7 +34,7 @@ export default function CreateNewTmuxSession() {
 
                 toast.style = Toast.Style.Success;
                 toast.style = Toast.Style.Success;
-                toast.message = `New session ${values.newSessionName} is setup successfully`;
+                toast.message = `New session ${sessionName} is setup successfully`;
                 setLoading(false);
               });
             }}

@@ -1,14 +1,16 @@
 import { useState, useEffect } from "react";
-import { List, Icon, Action, ActionPanel, Toast, showToast, Detail } from "@raycast/api";
+import { List, Icon, Action, ActionPanel, Toast, showToast, Detail, useNavigation } from "@raycast/api";
 import { LocalStorage } from "@raycast/api";
 import { SelectTerminalApp } from "./SelectTermnialApp";
 import { deleteSession, getAllSession, switchToSession } from "./sessionUtils";
+import { RenameTmuxSession } from "./RenameTmuxSession";
 
 export default function Command() {
   const [sessions, setSessions] = useState<Array<string>>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isTerminalSetup, setIsTerminalSetup] = useState(false);
 
+  const { push } = useNavigation();
   async function checkTerminalSetup(): Promise<boolean> {
     const localTerminalAppName = await LocalStorage.getItem<string>("terminalAppName");
 
@@ -31,6 +33,24 @@ export default function Command() {
     }
   }
 
+  const setupListSesssions = () => {
+    getAllSession((error, stdout) => {
+      if (error) {
+        console.error(`exec error: ${error}`);
+        setIsLoading(false);
+        return;
+      }
+
+      const lines = stdout.trim().split("\n");
+
+      if (lines?.length > 0) {
+        setSessions(lines);
+      }
+
+      setIsLoading(false);
+    });
+  };
+
   useEffect(() => {
     (async () => {
       setIsLoading(true);
@@ -50,21 +70,8 @@ export default function Command() {
     }
 
     // List down all tmux session
-    getAllSession((error, stdout) => {
-      if (error) {
-        console.error(`exec error: ${error}`);
-        setIsLoading(false);
-        return;
-      }
-
-      const lines = stdout.trim().split("\n");
-
-      if (lines?.length > 0) {
-        setSessions(lines);
-      }
-
-      setIsLoading(false);
-    });
+    setIsLoading(true);
+    setupListSesssions();
   }, [isTerminalSetup]);
 
   return (
@@ -84,6 +91,13 @@ export default function Command() {
                     deleteSession(session, setIsLoading, () => setSessions(sessions.filter((s) => s !== session)))
                   }
                   shortcut={{ modifiers: ["cmd"], key: "d" }}
+                />
+                <Action
+                  title="Rename This Session"
+                  onAction={() => {
+                    push(<RenameTmuxSession session={session} callback={() => setupListSesssions()} />);
+                  }}
+                  shortcut={{ modifiers: ["cmd"], key: "r" }}
                 />
               </ActionPanel>
             }
