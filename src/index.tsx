@@ -3,8 +3,8 @@ import { List, Icon, Action, ActionPanel, Toast, showToast, Detail } from "@rayc
 import { exec, execSync } from "child_process";
 import { LocalStorage, showHUD } from "@raycast/api";
 import { SelectTerminalApp } from "./SelectTermnialApp";
-
-const env = Object.assign({}, process.env, { PATH: "/usr/local/bin:/usr/bin:/opt/homebrew/bin" });
+import { getAllSession } from "./sessionUtils";
+import { env } from "./config";
 
 async function openTerminal() {
   const localTerminalAppName = await LocalStorage.getItem<string>("terminalAppName");
@@ -85,7 +85,7 @@ export default function Command() {
     }
 
     // List down all tmux session
-    exec(`tmux list-sessions | awk '{print $1}' | sed 's/://'`, { env }, (error, stdout, stderr) => {
+    getAllSession((error, stdout) => {
       if (error) {
         console.error(`exec error: ${error}`);
         setIsLoading(false);

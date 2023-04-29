@@ -21,6 +21,12 @@
       "title": "Change Default Terminal",
       "description": "Change Default Terminal so that it can be opened with the correct app",
       "mode": "view"
+    },
+    {
+      "name": "create_new_session",
+      "title": "Create New Session",
+      "description": "Create New Tmux Session",
+      "mode": "view"
     }
   ],
   "dependencies": {
