@@ -1,6 +1,7 @@
 import { ChildProcess, exec, ExecException, execSync } from "child_process";
-import { env } from "./config";
+import { env } from "../config";
 import { LocalStorage, showHUD, showToast, Toast } from "@raycast/api";
+import { openTerminal } from "./terminalUtils";
 
 export function getAllSession(
   callback: (error: ExecException | null, stdout: string, stderr: string) => void
@@ -53,11 +54,6 @@ export async function switchToSession(session: string, setLoading: (value: boole
     }
     return;
   });
-}
-
-async function openTerminal() {
-  const localTerminalAppName = await LocalStorage.getItem<string>("terminalAppName");
-  execSync(`open -a ${localTerminalAppName}`);
 }
 
 export async function deleteSession(session: string, setLoading: (value: boolean) => void, callback: () => void) {
