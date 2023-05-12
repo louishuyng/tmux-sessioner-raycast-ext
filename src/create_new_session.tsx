@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Action, ActionPanel, Form, showToast, Toast } from "@raycast/api";
-import { creatNewSession, getAllSession } from "./utils/sessionUtils";
+import { Action, ActionPanel, Form, popToRoot, showToast, Toast } from "@raycast/api";
+import { creatNewSession, getAllSession } from "./sessionUtils";
 
 export default function CreateNewTmuxSession() {
   const [loading, setLoading] = useState<boolean>(false);
@@ -36,6 +36,7 @@ export default function CreateNewTmuxSession() {
                 toast.style = Toast.Style.Success;
                 toast.message = `New session ${sessionName} is setup successfully`;
                 setLoading(false);
+                popToRoot();
               });
             }}
           />
